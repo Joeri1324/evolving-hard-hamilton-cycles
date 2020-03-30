@@ -1,0 +1,160 @@
+
+<html>
+  <head>
+    <title>Hamilton Cycle Problem</title>
+    <link rel="shortcut icon" href="/img/favicon.ico" />
+    <link rel="stylesheet" href="main.css">
+    <link href='https://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+  
+  <div id="cookie-overlay" class="hidden">
+    <div id="cookie-overlay-content">
+      <p>Is it okay if I use google analytics to track your presence here?</p>
+      <button class="tracking" id="tracking-accept" onclick="acceptCookies();">Yes</button>
+      <button class="tracking" id="tracking-decline" onclick="declineCookies();">No</button>
+    </div>
+  </div>
+  
+  <div class="header">
+    <h1>Complexity of the Hamilton Cycle Problem</h1>
+    <div id="introduction">
+      <h2>Introduction</h2>
+      <p>
+      This page contains additional information to <a href="\data\Van_Horn_et_al-A_Predictive_Data_Analytic.pdf" target="_blank">"A Predictive Data Analytic for the Hardness of Hamiltonian Cycle Problem Instances"</a>. All results can be downloaded in csv format <a href="\data\all_results.zip" target="_blank">here</a> (zip).
+      </p>
+      <p>
+      The figure on this page illustrates the complexity of the hamilton cycle problem, 
+      the problem of determining whether a path exists that visits every vertex in a graph exactly once and ends at the starting vertex.
+      The inspiration for this page came from a paper by Cheeseman, Kanefsky and Taylor "Where the <em>Really</em> hard problems are" (1991), and a desire to enlarge and clarify their figures on this topic.
+      </p>
+      <p>
+      Two simple backtrack algorithms (with 2 specific heuristics, more on that later) for this problem were run on a large set of (randomly generated) graphs of increasing average connectivity. 
+      More specifically: for each average connectivity 20 graphs were generated for both 16- and 24-vertex graphs. 
+      The amount of iterations (divided by the graph size) needed by the algorithm to come to a conclusion is displayed here.
+      </p>
+    </div>
+    <div id="algorithms">
+    <h2>Algorithms</h2>
+    <h3>Cheeseman et al.'s backtracking algorithm</h3>
+    <p>The two heuristics employed by the Cetal algorithm are:
+      <ol>
+        <li>Start at the node with the highest connectivity</li>
+        <li>Order the neighbouring nodes of the last visited node by their connections to unvisited nodes (more is better)</li>
+      </ol>
+    </p>
+    <h3>Horn's backtracking algorithm</h3>
+    <p>The two heuristics employed by this backtrack algorithm are:
+      <ol>
+        <li>Start at the node with the lowest connectivity</li>
+        <li>Order the neighbouring nodes of the last visited node by their connections to unvisited nodes (less is better)</li>
+      </ol>
+    </p>
+    <h3>Vandergriend & Culberson's pruning algorithm</h3>
+    <p>Vacul precedes search with a check for connectedness and cut-vertices (vertices that when removed cause the graph to be disconnected) to determine quickly if it is possible for the graph to be hamiltonian.
+    </p><p>During search it removes edges in the graph that cannot possibly be in the hamilton cycle, reducing the search space and iterations needed to reach a conclusion.
+    </p>
+    </div>
+    <div id="usage">
+      <h2>Legend</h2>
+  
+      <svg height="1em" width="1em">
+        <circle cx=".5em" cy=".5em" r="3.5" stroke="none" fill="#33cc33" />
+      </svg>
+      Represents a graph that has been determined to be hamiltonian. <br/>
+  
+      <svg height="1em" width="1em">
+        <circle cx=".5em" cy=".5em" r="3.5" stroke="none" fill="#ff0000" />
+      </svg>
+      Represents a graph that has been determined to be non-hamiltonian. <br/>
+      <svg height="1em" width="1em">
+        <circle cx=".5em" cy=".5em" r="3.5" stroke="none" fill="#0000ff" />
+      </svg>
+      Represents a graph that took too long to analyze.<br/>
+      <p>
+      Hovering over a data point shows a histogram of the connectivity in that graph, with the connectivity on the x-axis and the amount of vertices that have that connectivity on the y-axis.
+      </p>
+      <p>
+      Clicking on a data point highlights all data points with the same graph, allowing performance comparison between algorithms. 
+      </p>
+    </div>
+  
+  </div>
+    <div class="full-width-container">
+      <div class="plot-menu-button-container">
+        <button class="plot-menu-button" onclick="toggleMenu(this);">Open menu</button>
+      </div>
+      <div id="plot-menu" class="plot-menu collapsed">
+        <div class="plot-menu-content">
+          <div class="plot-menu-header">
+            <p>Pick which results should be plotted.</p>
+          </div>
+          <div class="plot-menu-column">
+            <ul>
+              <li><input type="checkbox" class="cetal graphSize16 data" id="initialDataCheckbox" onchange="toggleCheckbox(this);"><label>Cetal 16 node results</label>
+                <ul>
+                  <li><input type="checkbox" class="cetal graphSize16 average" onchange="toggleCheckbox(this);"><label>average</label></li>
+                  <li><input type="checkbox" class="cetal graphSize16 median" onchange="toggleCheckbox(this);"><label>median</label></li>
+                </ul>
+              </li>
+              <li><input type="checkbox" class="cetal graphSize24 data" onchange="toggleCheckbox(this);"><label>Cetal 24 node results</label>
+                <ul>
+                  <li><input type="checkbox" class="cetal graphSize24 average" onchange="toggleCheckbox(this);"><label>average</label></li>
+                  <li><input type="checkbox" class="cetal graphSize24 median" onchange="toggleCheckbox(this);"><label>median</label></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="plot-menu-column">
+            <ul>
+              <li><input type="checkbox" class="horn graphSize16 data" onchange="toggleCheckbox(this);"><label>Horn 16 node results</label>
+                <ul>
+                  <li><input type="checkbox" class="horn graphSize16 average" onchange="toggleCheckbox(this);"><label>average</label></li>
+                  <li><input type="checkbox" class="horn graphSize16 median" onchange="toggleCheckbox(this);"><label>median</label></li>
+                </ul>
+              </li>
+              <li><input type="checkbox" class="horn graphSize24 data" onchange="toggleCheckbox(this);"><label>Horn 24 node results</label>
+                <ul>
+                  <li><input type="checkbox" class="horn graphSize24 average" onchange="toggleCheckbox(this);"><label>average</label></li>
+                  <li><input type="checkbox" class="horn graphSize24 median" onchange="toggleCheckbox(this);"><label>median</label></li>
+                </ul>
+              </li>
+        
+            </ul>
+          </div>
+          <div class="plot-menu-column">
+            <ul>
+              <li><input type="checkbox" class="vacul graphSize16 data" onchange="toggleCheckbox(this);"><label>Vacul 16 node results</label>
+                <ul>
+                  <li><input type="checkbox" class="vacul graphSize16 average" onchange="toggleCheckbox(this);"><label>average</label></li>
+                  <li><input type="checkbox" class="vacul graphSize16 median" onchange="toggleCheckbox(this);"><label>median</label></li>
+                </ul>
+              </li>
+              <li><input type="checkbox" class="vacul graphSize24 data" onchange="toggleCheckbox(this);"><label>Vacul 24 node results</label>
+                <ul>
+                  <li><input type="checkbox" class="vacul graphSize24 average" onchange="toggleCheckbox(this);"><label>average</label></li>
+                  <li><input type="checkbox" class="vacul graphSize24 median" onchange="toggleCheckbox(this);"><label>median</label></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div id="plotCanvas" class="canvas"><div class="loader"></div></div>
+    </div>
+    <div id="full-width-container">
+      <div class="graph-legend">
+        <h2>Highlighted graph</h2>
+        <p>The currently highlighted graph is displayed below. If it contains a Hamilton cycle, the edges in the cycle are green.
+        The color and label of a node indicate its degree (a.k.a. connectivity).</p>
+        <p>Dragging a node fixes it to a location, double clicking makes it free to move again.</p>
+      </div>
+      <div id="graphCanvas" class="canvas"></div>
+    </div>
+  
+  <script type="text/javascript" src="main.js"></script>
+  <script src="d3.min.js"></script>
+  <script src="plotScripts.js" charset="utf-8"></script>
+  <script src="graphScripts.js" charset="utf-8"></script>
+  </body>
+  
