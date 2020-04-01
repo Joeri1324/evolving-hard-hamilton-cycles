@@ -9,22 +9,30 @@ object Hillclimb { // extends App {
     if (timeOrIterations == "time") nanoTime - startTime > maxTime
     else                            curIter > maxIter
 
-  def hillclimb(index: Int, graphSize: Int, numberOfEdges: Int, maxEvaluations: Int): Int = {
-    val graph = GraphGenerator.genGraph(graphSize, numberOfEdges)
+  def hillclimb(
+    index: Int,
+    graphSize: Int,
+    maxEvaluations: Int,
+    folderName: String,
+    graph: Array[Array[Int]],
+    totalEvaluations: Int
+  ): Int = {
+
     val folder = randomUUID
     var changed = true
     var currentGraph = graph
-    var maxFitness = 0
+    val temp = CheckAllWithPruningLow.solve(currentGraph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
+    var maxFitness = temp._2
     var maxHamiltonian = true
     var bestPath = List[Int]()
     var i = 0
-    Utils.delete(s"results/hillclimb/$maxEvaluations-evaluations/$graphSize-size/$index")
+    // Utils.delete(s"results/hillclimb/$maxEvaluations-evaluations/$graphSize-size/$index")
 
+    
     while (i < maxEvaluations) {
       val candidate = Utils.randomMutation(currentGraph)
       val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(candidate, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
-
-
+      
       if (recursions >= maxFitness) {
         changed = true
         currentGraph = candidate
@@ -40,7 +48,7 @@ object Hillclimb { // extends App {
         }
         val bp = if (bestPath.isEmpty) Nil else bestPath :+ bestPath.head
         val json = GraphGenerator.graphToJson(i, currentGraph, recursions, maxHamiltonian, bp)
-        GraphGenerator.writeGraphToFile(s"results/hillclimb/$maxEvaluations-evaluations/$graphSize-size/$index", i, json)
+        GraphGenerator.writeGraphToFile(s"results/$folderName/hillclimb/$graphSize/$totalEvaluations/$index", i, json)
       }
       i = i + 1
     }

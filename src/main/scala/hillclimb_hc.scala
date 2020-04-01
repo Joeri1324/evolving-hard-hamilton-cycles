@@ -10,16 +10,17 @@ object HillclimbHC { // extends App {
     if (timeOrIterations == "time") nanoTime - startTime > maxTime
     else                            curIter > maxIter
 
-  def hillclimb(index: Int, graphSize: Int, numberOfEdges: Int, maxEvaluations: Int): Int = {
+  def hillclimb(index: Int, graphSize: Int, maxEvaluations: Int, folderName: String, graph: Array[Array[Int]], totalEvaluations: Int): Int = {
     val folder = randomUUID
     var changed = true
-    var currentGraph = GraphGenerator.genGraphWithHamiltonCycle(graphSize, numberOfEdges)
-    var maxFitness = 0
+    var currentGraph = graph
+    val temp = CheckAllWithPruningLow.solve(currentGraph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
+    var maxFitness = temp._2
     var maxHamiltonian = true
     var bestPath = List[Int]()
     var i = 0
     // val directory = new Directory(new File(s"results/hillclimb-hc/$maxEvaluations-evaluations/$graphSize-size/$index"))
-    Utils.delete(s"results/hillclimb-hc/$maxEvaluations-evaluations/$graphSize-size/$index")
+    // Utils.delete(s"results/hillclimb-hc/$maxEvaluations-evaluations/$graphSize-size/$index")
     // try {
     //   path.deleteRecursively(continueOnFailure = false) 
     // } catch {
@@ -44,24 +45,24 @@ object HillclimbHC { // extends App {
           case None => { maxHamiltonian = false}
         }
         val json = GraphGenerator.graphToJson(i, candidate, recursions, maxHamiltonian, bestPath :+ bestPath.head)
-        GraphGenerator.writeGraphToFile(s"results/hillclimb-hc/$maxEvaluations-evaluations/$graphSize-size/$index", i, json)
+        GraphGenerator.writeGraphToFile(s"results/$folderName/hillclimb-hc/$graphSize/$totalEvaluations/$index", i, json)
       }
       i = i + 1
     }
     return maxFitness
   }
 
-  val maxEvaluations = 2000
-  val numberOfGraphs = 10
-  val graphSizes = List(12) //, 14) // , 16, 18, 20)
+  // val maxEvaluations = 2000
+  // val numberOfGraphs = 10
+  // val graphSizes = List(12) //, 14) // , 16, 18, 20)
 
-  def sum(i: Array[Array[Int]]): Int = {
-    var result = 0
-    i.foreach(row => {
-      row.foreach(result += _)
-    })
-    result
-  }
+  // def sum(i: Array[Array[Int]]): Int = {
+  //   var result = 0
+  //   i.foreach(row => {
+  //     row.foreach(result += _)
+  //   })
+  //   result
+  // }
 
   // for (graphSize <- graphSizes) {
   //   println(s"Handeling graph size: $graphSize")

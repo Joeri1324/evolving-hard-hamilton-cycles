@@ -15,26 +15,27 @@ object PPAHC { // {extends App {
     def ppa(
         index: Int,
         graphSize: Int,
-        amountOfEdges: Int,
         maxEvaluations: Int,
+        folderName: String,
+        l: Seq[Array[Array[Int]]],
+        newEvaluations: Int,
         // k: Int = 20,
         // y: Int = 5,
     ): Int = {
         val k = 20
         val numberOfGens = maxEvaluations / 20
         val populationSize = 10
-        val l = for (_ <- 0 until populationSize) yield GraphGenerator.genGraphWithHamiltonCycle(graphSize, amountOfEdges)
+        // val (l, newEvaluations) = Utils.loadPopulation(true, index, graphSize, "ppa-hc", maxEvaluations, folderName, populationSize)
         var p = scala.collection.mutable.ArraySeq(l:_*)
         var bestGraph = p.head
         var maxFitness = 0
         var maxHamiltonian = true
         var bestPath: List[Int] = Nil
         var chicke = 0
-        Utils.delete(s"results/ppa-hc/$maxEvaluations-evaluations/$graphSize-size/$index")
+        // Utils.delete(s"results/$folderName/ppa-hc/$maxEvaluations-evaluations/$graphSize-size/$index")
         var n = p.map(graph => CheckAllWithPruningLow.solve(graph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations")))
 
         for (i <- 0 until numberOfGens) {
-            var n = p.map(graph => CheckAllWithPruningLow.solve(graph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations")))
 
             p = scala.collection.mutable.ArraySeq(p.indices.sortWith((a, b) => n(a)._2 > n(b)._2).map(i => p(i)): _*)
 
@@ -45,6 +46,7 @@ object PPAHC { // {extends App {
               val r = Utils.randomMutationHC(p(0))
               val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
               if (recursions >= n(0)._2) {
+                  n(0) = (hamiltonian, recursions, time, path)
                   p(0) = r
               }
               chicke = chicke + 1
@@ -54,6 +56,7 @@ object PPAHC { // {extends App {
               val r = Utils.randomMutationHC(p(1))
               val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
               if (recursions >= n(1)._2) {
+                  n(1) = (hamiltonian, recursions, time, path)
                   p(1) = r
               }
               chicke = chicke + 1
@@ -78,6 +81,7 @@ object PPAHC { // {extends App {
                 val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
                 if (recursions >= n_sorted(i.toInt)._2 && chicke < maxEvaluations) {
                     p(i.toInt) = r
+                    n(i) = (hamiltonian, recursions, time, path)
                 }
                 chicke = chicke + 1
             }
@@ -93,8 +97,21 @@ object PPAHC { // {extends App {
                 case Some(solution) => { bestPath = solution }
                 case None => { bestPath = List() }
             }
-            val json = GraphGenerator.graphToJson(i, bestGraph, maxFitness, maxHamiltonian, bestPath)
-            GraphGenerator.writeGraphToFile(s"results/ppa-hc/$maxEvaluations-evaluations/$graphSize-size/$index", i, json)
+            for (j <- p.indices) {
+                val hams = n_sorted.head._1 match {
+                    case Some(true) => { true }
+                    case Some(false) => { false }
+                    case None => { false}
+                }
+                var sols = n_sorted.head._4 match {
+                    case Some(solution) => {  solution }
+                    case None => { List() }
+                }
+                val json = GraphGenerator.graphToJson(j, p(j), n(j)._2, hams, sols)
+                GraphGenerator.writeGraphToFile(s"results/$folderName/ppa-hc/$graphSize/$newEvaluations/$index/$j", i, json)
+            }
+            // val json = GraphGenerator.graphToJson(i, bestGraph, maxFitness, maxHamiltonian, bestPath)
+            // GraphGenerator.writeGraphToFile(s"results/$folderName/ppa-hc/$graphSize/$maxEvaluations/$index", i, json)
         }
         return maxFitness
         // val l = for (_ <- 0 to populationSize) yield GraphGenerator.genGraphWithHamiltonCycle(graphSize, amountOfEdges)
