@@ -70,60 +70,88 @@ object Experiment extends App {
     }
   }
 
-  def hamiltonExperiment(graphSizes: List[(Int, Int)], numberOfGraphs: Int, folderName: String, populationSize: Int) = {
+  def calcNumberOEdges(graphSize: Int, i: Int, numberOfGraphs: Int) = {
+    val maximumEdgesPossible = graphSize * (graphSize - 1) / 2
+    
+    (maximumEdgesPossible * i / numberOfGraphs).toInt
+  }
+
+  def experiment(graphSizes: List[(Int, Int)], numberOfGraphs: Int, folderName: String, populationSize: Int) = {
     for ((graphSize, maxEvaluations) <- graphSizes) {
       val currentEvalHill = getCurrentEval(folderName, "hillclimb-hc", graphSize)
       val f1 = for (
         i                    <- 1 to numberOfGraphs;
-        (graph, totalEvaluations) <- Some(Utils.loadGraph(true, i, graphSize, maxEvaluations, folderName, "hillclimb-hc", currentEvalHill))
+        numberOfEdges        <- Some(calcNumberOEdges(graphSize, i, numberOfGraphs));
+        (graph, totalEvaluations) <- Some(Utils.loadGraph(numberOfEdges, true, i, graphSize, maxEvaluations, folderName, "hillclimb-hc", currentEvalHill))
       ) yield Future {
         val fitness = HillclimbHC.hillclimb(i, graphSize, maxEvaluations, folderName.toString, graph, totalEvaluations)
-        println(s"Graph: $i generated hillclimb-hc fitness: $fitness")
+        println(s"Graph: $i generated hillclimb-hc $graphSize fitness: $fitness")
       }
 
       val currentEvalPpa = getCurrentEval(folderName, "ppa-hc", graphSize)
       val f2 = for (
         i <- 1 to numberOfGraphs;
-        (pop, totalEvaluations) <- Some(Utils.loadPopulation(true, i, graphSize, "ppa-hc", maxEvaluations, folderName, populationSize, currentEvalPpa))
+        numberOfEdges        <- Some(calcNumberOEdges(graphSize, i, numberOfGraphs));
+        (pop, totalEvaluations) <- Some(Utils.loadPopulation(numberOfEdges, true, i, graphSize, "ppa-hc", maxEvaluations, folderName, populationSize, currentEvalPpa))
       ) yield Future {
         val fitness = PPAHC.ppa(i, graphSize, maxEvaluations, folderName.toString, pop, totalEvaluations)
-        println(s"Graph: $i generated ppa-hc fitness: $fitness")
+        println(s"Graph: $i generated ppa-hc $graphSize fitness: $fitness")
       }
 
-      val all = Future.sequence(f1 ++ f2)
-      Await.result(all, Duration.Inf)
-      println("done")
-    }
-  }
-
-
-
-  def nonExperiment(graphSizes: List[(Int, Int)], numberOfGraphs: Int, folderName: String, populationSize: Int) = {
-    
-    for ((graphSize, maxEvaluations) <- graphSizes) {
-      val currentEvalHill = getCurrentEval(folderName, "hillclimb", graphSize)
-      val f1 = for (
+      val currentEvalHill2 = getCurrentEval(folderName, "hillclimb", graphSize)
+      val f3 = for (
         i                    <- 1 to numberOfGraphs;
-        (graph, totalEvaluations) <- Some(Utils.loadGraph(true, i, graphSize, maxEvaluations, folderName, "hillclimb", currentEvalHill))
+        numberOfEdges        <- Some(calcNumberOEdges(graphSize, i, numberOfGraphs));
+        (graph, totalEvaluations) <- Some(Utils.loadGraph(numberOfEdges, true, i, graphSize, maxEvaluations, folderName, "hillclimb", currentEvalHill2))
       ) yield Future {
         val fitness = Hillclimb.hillclimb(i, graphSize, maxEvaluations, folderName.toString, graph, totalEvaluations)
-        println(s"Graph: $i generated hillclimb fitness: $fitness")
+        println(s"Graph: $i generated hillclimb $graphSize  fitness: $fitness")
       }
 
-      val currentEvalPpa = getCurrentEval(folderName, "ppa", graphSize)
-      val f2 = for (
+      val currentEvalPpa2 = getCurrentEval(folderName, "ppa", graphSize)
+      val f4 = for (
         i <- 1 to numberOfGraphs;
-        (pop, totalEvaluations) <- Some(Utils.loadPopulation(true, i, graphSize, "ppa", maxEvaluations, folderName, populationSize, currentEvalPpa))
+        numberOfEdges        <- Some(calcNumberOEdges(graphSize, i, numberOfGraphs));
+        (pop, totalEvaluations) <- Some(Utils.loadPopulation(numberOfEdges, true, i, graphSize, "ppa", maxEvaluations, folderName, populationSize, currentEvalPpa2))
       ) yield Future {
         val fitness = PPA.ppa(i, graphSize, maxEvaluations, folderName.toString, pop, totalEvaluations)
-        println(s"Graph: $i generated ppa fitness: $fitness")
+        println(s"Graph: $i generated ppa $graphSize fitness: $fitness")
       }
 
-      val all = Future.sequence(f1 ++ f2)
+      val all = Future.sequence(f1 ++ f2 ++ f3 ++ f4)
       Await.result(all, Duration.Inf)
       println("done")
     }
   }
+
+
+
+  // def nonExperiment(graphSizes: List[(Int, Int)], numberOfGraphs: Int, folderName: String, populationSize: Int) = {
+    
+  //   for ((graphSize, maxEvaluations) <- graphSizes) {
+  //     val currentEvalHill = getCurrentEval(folderName, "hillclimb", graphSize)
+  //     val f1 = for (
+  //       i                    <- 1 to numberOfGraphs;
+  //       (graph, totalEvaluations) <- Some(Utils.loadGraph(true, i, graphSize, maxEvaluations, folderName, "hillclimb", currentEvalHill))
+  //     ) yield Future {
+  //       val fitness = Hillclimb.hillclimb(i, graphSize, maxEvaluations, folderName.toString, graph, totalEvaluations)
+  //       println(s"Graph: $i generated hillclimb fitness: $fitness")
+  //     }
+
+  //     val currentEvalPpa = getCurrentEval(folderName, "ppa", graphSize)
+  //     val f2 = for (
+  //       i <- 1 to numberOfGraphs;
+  //       (pop, totalEvaluations) <- Some(Utils.loadPopulation(true, i, graphSize, "ppa", maxEvaluations, folderName, populationSize, currentEvalPpa))
+  //     ) yield Future {
+  //       val fitness = PPA.ppa(i, graphSize, maxEvaluations, folderName.toString, pop, totalEvaluations)
+  //       println(s"Graph: $i generated ppa fitness: $fitness")
+  //     }
+
+  //     val all = Future.sequence(f1 ++ f2)
+  //     Await.result(all, Duration.Inf)
+  //     println("done")
+  //   }
+  // }
 
 
   val folderName = "super-run" // randomUUID
@@ -131,6 +159,6 @@ object Experiment extends App {
   val populationSize = 10
  // val graphSizes = List((12, 100), (14, 100)) //, (16, 500), (18, 500), (20, 500))
   // hamiltonExperiment(graphSizes, numberOfGraphs, folderName, populationSize)
-  val graphSizes = List((14, 5000), (16, 1000)) // , (18, 300), (20, 300))
-  hamiltonExperiment(graphSizes, numberOfGraphs, folderName, populationSize)
+  val graphSizes = List((12, 500), (14, 500), (16, 500), (18, 500), (20, 500))
+  experiment(graphSizes, numberOfGraphs, folderName, populationSize)
 }

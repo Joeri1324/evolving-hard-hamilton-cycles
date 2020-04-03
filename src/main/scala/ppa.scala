@@ -41,8 +41,8 @@ object PPA { // extends App {
 
             var n_sorted = n.sortWith((a, b) =>  a._2 > b._2)
 
-            // number one, do 10 times
-            for (_ <- 0 until 7) {
+            // number one, do 6 times, 1 mutation
+            for (_ <- 0 until 6) {
               val r = Utils.randomMutation(p(0))
               val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
               if (recursions >= n(0)._2) {
@@ -51,13 +51,43 @@ object PPA { // extends App {
               }
               chicke = chicke + 1
             }
-            // number two, do 
+            // number two, do 5 times, 2 mutations
             for (_ <- 0 until 5) {
-              val r = Utils.randomMutation(p(1))
+              val r = Utils.randomMutations(2, p(1), Utils.randomMutation)
               val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
               if (recursions >= n(1)._2) {
                   n(1) = (hamiltonian, recursions, time, path)
                   p(1) = r
+              }
+              chicke = chicke + 1
+            }
+            // number three, do 4 times, 5 mutations
+            for (_ <- 0 until 4) {
+              val r = Utils.randomMutations(5, p(2), Utils.randomMutation)
+              val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
+              if (recursions >= n(2)._2) {
+                  n(2) = (hamiltonian, recursions, time, path)
+                  p(2) = r
+              }
+              chicke = chicke + 1
+            }
+            // number four, do 3 times, 5 mutations
+            for (_ <- 0 until 3) {
+              val r = Utils.randomMutations(k, p(3), Utils.randomMutation)
+              val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
+              if (recursions >= n(3)._2) {
+                  n(3) = (hamiltonian, recursions, time, path)
+                  p(3) = r
+              }
+              chicke = chicke + 1
+            }
+            // number five, do 2 times, 10 mutations
+            for (_ <- 0 until 2) {
+              val r = Utils.randomMutations(10, p(4), Utils.randomMutation)
+              val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
+              if (recursions >= n(4)._2) {
+                  n(4) = (hamiltonian, recursions, time, path)
+                  p(4) = r
               }
               chicke = chicke + 1
             }
@@ -76,8 +106,8 @@ object PPA { // extends App {
             // }
 
             // bottom 8
-            for (i <- (2 until n.size)) {
-                val r = Utils.randomMutations(k, p(i.toInt), Utils.randomMutation)
+            for (i <- (5 until n.size)) {
+                val r = Utils.randomMutations(20, p(i.toInt), Utils.randomMutation)
                 val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
                 if (recursions >= n_sorted(i.toInt)._2 && chicke < maxEvaluations) {
                     n(i) = (hamiltonian, recursions, time, path)
