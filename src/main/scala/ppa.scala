@@ -19,12 +19,13 @@ object PPA { // extends App {
         folderName: String,
         l: Seq[Array[Array[Int]]],
         newEvaluations: Int,
+        algorithm: Solver
         // k: Int = 20,
         // y: Int = 5,
     ): Int = {
         val populationSize = 10
         val k = 20
-        val numberOfGens = maxEvaluations / 20
+        val numberOfGens = maxEvaluations / 25
         var p = scala.collection.mutable.ArraySeq(l:_*)
 
         var bestGraph = p.head
@@ -33,7 +34,7 @@ object PPA { // extends App {
         var bestPath: List[Int] = Nil
         var chicke = 0
         // Utils.delete(s"results/$folderName/ppa/$maxEvaluations-evaluations/$graphSize-size/$index")
-        var n = p.map(graph => CheckAllWithPruningLow.solve(graph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations")))
+        var n = p.map(graph => algorithm.solve(graph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations")))
 
         for (i <- 0 until numberOfGens) {
 
@@ -44,7 +45,7 @@ object PPA { // extends App {
             // number one, do 6 times, 1 mutation
             for (_ <- 0 until 6) {
               val r = Utils.randomMutation(p(0))
-              val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
+              val (hamiltonian, recursions, time, path) = algorithm.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
               if (recursions >= n(0)._2) {
                 n(0) = (hamiltonian, recursions, time, path)
                 p(0) = r

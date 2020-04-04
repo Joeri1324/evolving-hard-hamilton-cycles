@@ -76,7 +76,8 @@ object Experiment extends App {
     (maximumEdgesPossible * i / numberOfGraphs).toInt
   }
 
-  def experiment(graphSizes: List[(Int, Int)], numberOfGraphs: Int, folderName: String, populationSize: Int) = {
+  def experiment(graphSizes: List[(Int, Int)], numberOfGraphs: Int, folderName: String, populationSize: Int, algorithm: Solver) = {
+    var functions = Seq[scala.concurrent.Future[Unit]]()
     for ((graphSize, maxEvaluations) <- graphSizes) {
       val currentEvalHill = getCurrentEval(folderName, "hillclimb-hc", graphSize)
       val f1 = for (
@@ -84,7 +85,7 @@ object Experiment extends App {
         numberOfEdges        <- Some(calcNumberOEdges(graphSize, i, numberOfGraphs));
         (graph, totalEvaluations) <- Some(Utils.loadGraph(numberOfEdges, true, i, graphSize, maxEvaluations, folderName, "hillclimb-hc", currentEvalHill))
       ) yield Future {
-        val fitness = HillclimbHC.hillclimb(i, graphSize, maxEvaluations, folderName.toString, graph, totalEvaluations)
+        val fitness = HillclimbHC.hillclimb(i, graphSize, maxEvaluations, folderName.toString, graph, totalEvaluations, algorithm)
         println(s"Graph: $i generated hillclimb-hc $graphSize fitness: $fitness")
       }
 
@@ -94,7 +95,7 @@ object Experiment extends App {
         numberOfEdges        <- Some(calcNumberOEdges(graphSize, i, numberOfGraphs));
         (pop, totalEvaluations) <- Some(Utils.loadPopulation(numberOfEdges, true, i, graphSize, "ppa-hc", maxEvaluations, folderName, populationSize, currentEvalPpa))
       ) yield Future {
-        val fitness = PPAHC.ppa(i, graphSize, maxEvaluations, folderName.toString, pop, totalEvaluations)
+        val fitness = PPAHC.ppa(i, graphSize, maxEvaluations, folderName.toString, pop, totalEvaluations, algorithm)
         println(s"Graph: $i generated ppa-hc $graphSize fitness: $fitness")
       }
 
@@ -104,7 +105,7 @@ object Experiment extends App {
         numberOfEdges        <- Some(calcNumberOEdges(graphSize, i, numberOfGraphs));
         (graph, totalEvaluations) <- Some(Utils.loadGraph(numberOfEdges, true, i, graphSize, maxEvaluations, folderName, "hillclimb", currentEvalHill2))
       ) yield Future {
-        val fitness = Hillclimb.hillclimb(i, graphSize, maxEvaluations, folderName.toString, graph, totalEvaluations)
+        val fitness = Hillclimb.hillclimb(i, graphSize, maxEvaluations, folderName.toString, graph, totalEvaluations, algorithm)
         println(s"Graph: $i generated hillclimb $graphSize  fitness: $fitness")
       }
 
@@ -114,14 +115,14 @@ object Experiment extends App {
         numberOfEdges        <- Some(calcNumberOEdges(graphSize, i, numberOfGraphs));
         (pop, totalEvaluations) <- Some(Utils.loadPopulation(numberOfEdges, true, i, graphSize, "ppa", maxEvaluations, folderName, populationSize, currentEvalPpa2))
       ) yield Future {
-        val fitness = PPA.ppa(i, graphSize, maxEvaluations, folderName.toString, pop, totalEvaluations)
+        val fitness = PPA.ppa(i, graphSize, maxEvaluations, folderName.toString, pop, totalEvaluations, algorithm)
         println(s"Graph: $i generated ppa $graphSize fitness: $fitness")
       }
-
-      val all = Future.sequence(f1 ++ f2 ++ f3 ++ f4)
-      Await.result(all, Duration.Inf)
-      println("done")
+      functions = functions ++ f1 ++ f2 ++ f3 ++ f4
     }
+    val all = Future.sequence(functions)
+    Await.result(all, Duration.Inf)
+    println("done")
   }
 
 
@@ -154,11 +155,11 @@ object Experiment extends App {
   // }
 
 
-  val folderName = "super-run" // randomUUID
+  val folderName = "supers-run" // randomUUID
   val numberOfGraphs = 10
   val populationSize = 10
  // val graphSizes = List((12, 100), (14, 100)) //, (16, 500), (18, 500), (20, 500))
   // hamiltonExperiment(graphSizes, numberOfGraphs, folderName, populationSize)
-  val graphSizes = List((12, 500), (14, 500), (16, 500), (18, 500), (20, 500))
-  experiment(graphSizes, numberOfGraphs, folderName, populationSize)
+  val graphSizes = List((12, 5000), (14, 1000), (16, 500), (18, 500), (20, 500))
+  experiment(graphSizes, numberOfGraphs, folderName, populationSize,  CheckAllWithPruningLow)
 }

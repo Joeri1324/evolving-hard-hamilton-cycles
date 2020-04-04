@@ -10,11 +10,11 @@ object HillclimbHC { // extends App {
     if (timeOrIterations == "time") nanoTime - startTime > maxTime
     else                            curIter > maxIter
 
-  def hillclimb(index: Int, graphSize: Int, maxEvaluations: Int, folderName: String, graph: Array[Array[Int]], totalEvaluations: Int): Int = {
+  def hillclimb(index: Int, graphSize: Int, maxEvaluations: Int, folderName: String, graph: Array[Array[Int]], totalEvaluations: Int, algorithm: Solver): Int = {
     val folder = randomUUID
     var changed = true
     var currentGraph = graph
-    val temp = CheckAllWithPruningLow.solve(currentGraph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
+    val temp = algorithm.solve(currentGraph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
     var maxFitness = temp._2
     var maxHamiltonian = true
     var bestPath = List[Int]()
@@ -30,7 +30,7 @@ object HillclimbHC { // extends App {
 
     while (i < maxEvaluations) {
       val candidate = Utils.randomMutationHC(currentGraph)
-      val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(candidate, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
+      val (hamiltonian, recursions, time, path) = algorithm.solve(candidate, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
       if (recursions >= maxFitness) {
         changed = true
         currentGraph = candidate
