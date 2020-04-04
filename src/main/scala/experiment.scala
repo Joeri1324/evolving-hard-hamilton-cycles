@@ -73,7 +73,7 @@ object Experiment extends App {
   def calcNumberOEdges(graphSize: Int, i: Int, numberOfGraphs: Int) = {
     val maximumEdgesPossible = graphSize * (graphSize - 1) / 2
     
-    (maximumEdgesPossible * i / numberOfGraphs).toInt
+    (maximumEdgesPossible * (i - 1) / numberOfGraphs).toInt
   }
 
   def experiment(graphSizes: List[(Int, Int)], numberOfGraphs: Int, folderName: String, populationSize: Int, algorithm: Solver) = {
@@ -156,10 +156,10 @@ object Experiment extends App {
 
 
   val folderName = "supers-run" // randomUUID
-  val numberOfGraphs = 10
+  val numberOfGraphs = 20
   val populationSize = 10
  // val graphSizes = List((12, 100), (14, 100)) //, (16, 500), (18, 500), (20, 500))
   // hamiltonExperiment(graphSizes, numberOfGraphs, folderName, populationSize)
-  val graphSizes = List((12, 5000), (14, 1000), (16, 500), (18, 500), (20, 500))
+  val graphSizes = List((12, 100), (14, 100), (16, 100), (18, 100), (20, 100))
   experiment(graphSizes, numberOfGraphs, folderName, populationSize,  CheckAllWithPruningLow)
 }
