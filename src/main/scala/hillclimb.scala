@@ -29,7 +29,22 @@ object Hillclimb { // extends App {
     var i = 0
     // Utils.delete(s"results/hillclimb/$maxEvaluations-evaluations/$graphSize-size/$index")
 
-    
+    temp._1 match {
+      case Some(tempHam) => {
+        temp._4 match {
+          case Some(tempSol) => {
+            val json = GraphGenerator.graphToJson(-1, currentGraph, temp._2, tempHam, tempSol :+ tempSol.head)
+            GraphGenerator.writeGraphToFile(s"results/$folderName/hillclimb/$graphSize/$totalEvaluations/$index", -1, json)
+          }
+          case None => {
+            val json = GraphGenerator.graphToJson(-1, currentGraph, temp._2, tempHam, List())
+            GraphGenerator.writeGraphToFile(s"results/$folderName/hillclimb/$graphSize/$totalEvaluations/$index", -1, json)
+          }
+        }
+      }
+      case None => {}
+    }
+
     while (i < maxEvaluations) {
       val candidate = Utils.randomMutation(currentGraph)
       val (hamiltonian, recursions, time, path) = algorithm.solve(candidate, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
