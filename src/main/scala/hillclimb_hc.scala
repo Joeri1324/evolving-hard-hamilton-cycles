@@ -3,7 +3,7 @@ import java.util.UUID.randomUUID
 import System._
 
 
-object HillclimbHC { // extends App {
+object HillclimbHC {
 
   def cutoff(maxTime: Long, maxIter: Int, timeOrIterations: String = "time")
     (curIter: Int, startTime: Long): Boolean =
@@ -19,14 +19,6 @@ object HillclimbHC { // extends App {
     var maxHamiltonian = true
     var bestPath = List[Int]()
     var i = 0
-    // val directory = new Directory(new File(s"results/hillclimb-hc/$maxEvaluations-evaluations/$graphSize-size/$index"))
-    // Utils.delete(s"results/hillclimb-hc/$maxEvaluations-evaluations/$graphSize-size/$index")
-    // try {
-    //   path.deleteRecursively(continueOnFailure = false) 
-    // } catch {
-    //   case e: IOException => // some file could not be deleted
-    // }
-    // directory.deleteRecursively()
 
     temp._1 match {
       case Some(tempHam) => {
@@ -68,33 +60,4 @@ object HillclimbHC { // extends App {
     }
     return maxFitness
   }
-
-  // val maxEvaluations = 2000
-  // val numberOfGraphs = 10
-  // val graphSizes = List(12) //, 14) // , 16, 18, 20)
-
-  // def sum(i: Array[Array[Int]]): Int = {
-  //   var result = 0
-  //   i.foreach(row => {
-  //     row.foreach(result += _)
-  //   })
-  //   result
-  // }
-
-  // for (graphSize <- graphSizes) {
-  //   println(s"Handeling graph size: $graphSize")
-  //   val numberOfEdges = ((scala.math.log(graphSize) + scala.math.log(scala.math.log(graphSize))) * graphSize / 2).toInt
-
-  //   for (i <- 1 until numberOfGraphs) {
-  //     val startingGraph = GraphGenerator.genGraphWithHamiltonCycle(graphSize, numberOfEdges)
-  //     val (graph, fitness, hamiltonian, bestPath) = hillclimb(i, graphSize, maxEvaluations, startingGraph)
-  //     // GraphGenerator.printGraph(graph)
-  //     println(s"Graph generated: $fitness")
-  //     // println(CheckAllWithPruningLow.solve(graph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations")))
-  //     // println(CheckOneDegreeWithPruning.solve(graph, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations")))
-  //     // println("sum", sum(graph))
-  //     val json = GraphGenerator.graphToJson(10, graph, fitness, hamiltonian, bestPath :+ bestPath.head)
-  //     GraphGenerator.writeGraphToFile(s"super_results", 10, json)
-  //   }
-  // }
 }

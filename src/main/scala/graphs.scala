@@ -35,33 +35,6 @@ case class Graph(
     graph
   }
 
-  // def randomMutation = {
-  //   val random = scala.util.Random
-
-  //   val edgeset = { for (e <- edges) yield (e.endpoints(0).id, e.endpoints(1).id) } toSet
-
-  //   val complement = for (
-  //     i <- 0 until size;
-  //     j <- 0 until size; 
-  //     if !edgeset.contains((i, j)) && !edgeset.contains((j, i)) && i != j && i < j
-  //   ) yield (i, j)
-
-  //   println(edges.size * complement.size)
-
-  //   val deleteEdge = random.nextInt(edges.size)
-  //   val newEdge    = random.nextInt(complement.size)
-
-  //   val n = Edges(List(Endpoint(complement(newEdge)._1), Endpoint(complement(newEdge)._2)))
-  //   val newEdges = edges.slice(0, deleteEdge) ::: edges.slice(deleteEdge + 1, edges.size)
-
-  //   (
-  //     Graph(identifier, vertices, n :: newEdges, connectivityMap, size),
-  //     edges(deleteEdge),
-  //     complement(newEdge)
-  //   )
-  // }
-
-
   def relativeEdgeAmount = {
     edges.size.toFloat / size * 2
   }
@@ -105,32 +78,11 @@ import DefaultJsonProtocol._
 
 object GraphReader {
 
-//   def graphsFromFile(fileName: String) = 
-//     scala.io.Source.fromFile(fileName)
-//       .mkString
-//       .parseJson
-//       .convertTo[GraphList]
-//       .graphs
-
   def handleFile(name: String) = 
     scala.io.Source.fromFile(name)
       .mkString
       .parseJson
       .convertTo[Graph]
-
-  // def graphsFromFolder(folder: String) = {
-  //   def handleFile(name: String) = 
-  //     scala.io.Source.fromFile(name)
-  //       .mkString
-  //       .parseJson
-  //       .convertTo[Graph]
-  // }
-
-  //   for {
-  //     filename <- new File(folder).listFiles
-  //     graph    <- Some(handleFile(filename.toString))
-  //   } yield graph
-  // }
 
 }
 

@@ -102,8 +102,6 @@ trait DepthFirst extends Solver {
     mutable.ListBuffer[(Int, Int)] = {
 
     var changed = false
-    // val doubleEdges = mutable.Set({
-    //   for ( i <- edges.keys; if (edges(i).size == 2)) yield (i) })
     
     val doubleEdges1 = for ( i <- edges.keys; if (edges(i).size == 2)) yield (i)
     var doubleEdges = doubleEdges1 toSet
@@ -254,8 +252,6 @@ trait DepthFirst extends Solver {
     val edges        = createEdgeMap(graph)
     var iterations   = 0
     val startTime    = nanoTime
-    // val vCount = mutable.Map[Int, Int]()
-    // val eCount = mutable.Map[(Int, Int), Int]()
     var solution: Option[List[Int]] = None
 
     def putBack(
@@ -287,13 +283,6 @@ trait DepthFirst extends Solver {
             putBack(deleted, edges); Some(false)
           }
           case Some(i)                 => {
-            // if (vCount.contains(i)) vCount(i) += 1 
-            // else                    vCount(i) = 1
-
-            // if (eCount.contains((i, sol.head))) eCount((i, sol.head)) += 1 
-            // else                                eCount((i, sol.head)) = 1
-            
-            // recurseSolve((i :: sol).reverse) match {
             recurseSolve(i :: sol) match {
               case None        => { putBack(deleted, edges); None }
               case Some(true)  => Some(true)

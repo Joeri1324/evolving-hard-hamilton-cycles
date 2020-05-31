@@ -33,30 +33,6 @@ object Utils {
         }
       }
     }
-    // if (currentEval != None) {
-    //   val popSize = new File(s"$folder/$currentEval/$index").listFiles.toList.length
-
-    //   val graphFiles = { for (i <- 0 until popSize) yield (new File(s"$folder/$currentEval/$index/$i")).listFiles.toList }
-
-
-    //   val maxFile = graphFiles(0).map(f => f.toString.split("/").last.stripSuffix(".json").toInt).max
-
-    //   val population = for (
-    //     i <- 0 until popSize
-    //    ) yield GraphReader.handleFile(s"$folder/$currentEval/$index/$i/$maxFile.json").array
-
-    //   return (population, currentEval + evaluations)
-    // }
-    // else if (hamilton) {
-    //   val numberOfEdges = r.nextInt(graphSize * (graphSize - 1) / 2)
-    //   val population = for (_ <- 0 until populationSize) yield GraphGenerator.genGraphWithHamiltonCycle(graphSize, numberOfEdges)
-    //   return (population, evaluations)
-    // }
-    // else {
-    //   val numberOfEdges = r.nextInt(graphSize * (graphSize - 1) / 2)
-    //   val population = for (_ <- 0 until populationSize) yield GraphGenerator.genGraph(graphSize, numberOfEdges)
-    //   return (population, evaluations)
-    // }
   }
 
   def loadGraph(numberOfEdges: Int, hamilton: Boolean, index: Int, graphSize: Int, evaluations: Int, folderName: String, algorithmName: String, mabyCurrentEval: Option[Int]): (Array[Array[Int]], Int) = {
@@ -77,19 +53,6 @@ object Utils {
         }
       }
     }
-    // if (d.exists) {
-    //   val files = d.listFiles.toList
-    //   val maxEvaluations = files.map(f => f.toString.split("/").last.toInt).max
-    //   val graphFiles = (new File(s"$folder/$maxEvaluations/$index")).listFiles.toList
-    //   val maxFile = graphFiles.map(f => f.toString.split("/").last.stripSuffix(".json").toInt).max
-    //   return (GraphReader.handleFile(s"$folder/$maxEvaluations/$index/$maxFile.json").array, maxEvaluations + evaluations)
-    // }
-    // else if (hamilton) {
-    //   return (GraphGenerator.genGraphWithHamiltonCycle(graphSize, numberOfEdges), evaluations)
-    // }
-    // else {
-    //   return (GraphGenerator.genGraph(graphSize, numberOfEdges), evaluations)
-    // }
   }
 
   def copy(graph: Array[Array[Int]]): Array[Array[Int]] = {

@@ -27,7 +27,6 @@ object Hillclimb { // extends App {
     var maxHamiltonian = true
     var bestPath = List[Int]()
     var i = 0
-    // Utils.delete(s"results/hillclimb/$maxEvaluations-evaluations/$graphSize-size/$index")
 
     temp._1 match {
       case Some(tempHam) => {
@@ -70,19 +69,4 @@ object Hillclimb { // extends App {
     }
     return maxFitness
   }
-
-  // val maxEvaluations = 1000
-  // val numberOfGraphs = 10
-  // val graphSizes = List(14) //, 16, 18, 20)
-
-  // for (graphSize <- graphSizes) {
-  //   println(s"Handeling graph size: $graphSize")
-  //   val numberOfEdges = ((scala.math.log(graphSize) + scala.math.log(scala.math.log(graphSize))) * graphSize / 2).toInt
-
-  //   for (i <- 1 until numberOfGraphs) {
-  //     val startingGraph = GraphGenerator.genGraph(graphSize, numberOfEdges)
-  //     val (graph, fitness, hamiltonian, bestPath) = hillclimb(i, graphSize, maxEvaluations, startingGraph)
-  //     println(s"Graph generated: $fitness")
-  //   }
-  // }
 }

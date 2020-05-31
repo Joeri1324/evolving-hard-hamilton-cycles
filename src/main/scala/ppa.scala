@@ -1,9 +1,7 @@
 package experiment
-
 import System._
 
-
-object PPA { // extends App {
+object PPA {
 
   val random = scala.util.Random
 
@@ -20,8 +18,6 @@ object PPA { // extends App {
         l: Seq[Array[Array[Int]]],
         newEvaluations: Int,
         algorithm: Solver
-        // k: Int = 20,
-        // y: Int = 5,
     ): Int = {
         val populationSize = 10
         val k = 20
@@ -93,19 +89,6 @@ object PPA { // extends App {
               chicke = chicke + 1
             }
 
-            // do the top 10 %
-            // val bound = scala.math.round(0.2 * n.size)
-            // for (i <- 0 to bound.toInt) {
-            //     for (_ <- 0 to scala.math.round(y / (i + 1)).toInt) {
-            //         val r = Utils.randomMutation(p(i.toInt))
-            //         val (hamiltonian, recursions, time, path) = CheckAllWithPruningLow.solve(r, cutoff(10000.toLong * 10000.toLong, 1000000000, "iterations"))
-            //         if (recursions >= n(i.toInt)._2) {
-            //             p(i.toInt) = r
-            //         }
-            //         chicke = chicke + 1
-            //     }
-            // }
-
             // bottom 8
             for (i <- (5 until n.size)) {
                 val r = Utils.randomMutations(20, p(i.toInt), Utils.randomMutation)
@@ -144,27 +127,10 @@ object PPA { // extends App {
         }
         return maxFitness
     }
-    
 
-    
     val numberOfGens = 1
-    // val graphSize = 12
-    // val numberOfEdges = ((scala.math.log(graphSize) + scala.math.log(scala.math.log(graphSize))) * graphSize / 2).toInt
     val k: Int = 20
     val y = 5
     val experiment_times = 10
     val maxEvaluations = 500
-
-    // for (i <- 0 until experiment_times) {
-    //   println(s"Starting ppa $i")
-    //   val (graph, fitness, hamiltonian) = ppa(
-    //       i,
-    //       14,
-    //       ((scala.math.log(14) + scala.math.log(scala.math.log(14))) * 14/ 2).toInt,
-    //       1000
-    //   )
-    //   println(s"Fitness: $fitness")
-    //     // val json = GraphGenerator.graphToJson(i, graph, fitness, hamiltonian, List[Int]())
-    //     // GraphGenerator.writeGraphToFile(s"results/ppa/$maxEvaluations-evaluations/$graphSize-difficult", i, json)
-    // }
 }
