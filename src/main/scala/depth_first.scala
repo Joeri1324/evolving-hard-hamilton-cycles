@@ -5,12 +5,12 @@ import scala.collection._
 
 trait Solver {
 
-    def name: String
+  def name: String
 
-    def solve(
-        graph: Array[Array[Int]],
-        cutoff: (Int, Long) => Boolean
-    ): (Option[Boolean], Int, Long, Option[List[Int]])
+  def solve(
+      graph: Array[Array[Int]],
+      cutoff: (Int, Long) => Boolean
+  ): (Option[Boolean], Int, Long, Option[List[Int]])
 }
 
 trait DepthFirst extends Solver {
@@ -23,7 +23,6 @@ trait DepthFirst extends Solver {
    * and return the deleted edges as a listbuffer. */
   def pruneFuncs: List[
     (Map[Int, mutable.Set[Int]], List[Int]) => mutable.ListBuffer[(Int, Int)]]
-
 
   /* Applied the pruning function of pruneFuncs exhaustively untill no more
    * edges can be deleted. */
@@ -145,6 +144,12 @@ trait DepthFirst extends Solver {
   def check(edges: Map[Int, mutable.Set[Int]]) = 
     checkFuncs.forall(f => f(edges))
 
+  // def startCheckFuncs: List[(Map[Int, mutable.Set[Int]]) => Boolean]
+
+  //   /* Applies all checkFuncs to the graph and checks if they are all true. */
+  // def checkStart(edges: Map[Int, mutable.Set[Int]]) = 
+  //   startCheckFuncs.forall(f => f(edges))
+
   /* Checks if a graph contains a vertex that has a degree lower than 2 */
   def checkOneDegree(edges: Map[Int, mutable.Set[Int]]): Boolean =
     edges.values.forall(_.size >= 2)
@@ -164,6 +169,37 @@ trait DepthFirst extends Solver {
       }
     
     recurse()
+  }
+
+   def checkClosedLoop(edges: Map[Int, mutable.Set[Int]]): Boolean = {
+    def recurse(index: Int, path: Set[Int] = Set[Int]()): Boolean = {
+      if (path.size == edges.size) {
+        return true
+      }
+      val neighbours = edges(index)
+
+      // all vertices in a closed loop have to have two neigh ours
+      if (neighbours.size != 2) {
+        return true
+      }
+
+      val neighboursNotInPath = neighbours.filterNot((vertex) => path.contains(vertex))
+
+      // println(" nerighbour ",  path, neighbours, neighboursNotInPath)
+      // closed loop
+      if (neighboursNotInPath.size == 0) {
+        return false
+      }
+      recurse(neighboursNotInPath.head, path + neighboursNotInPath.head)
+    }
+
+    //val required = edges.filter((vertexIndex, edges) => edges.size == 2)
+    val firstRequired = edges.find((keyValue) => keyValue._2.size == 2)
+
+    firstRequired match {
+      case Some(vertex) => recurse(vertex._1)
+      case None         => true
+    }
   }
 
   /* Implementation of tarjan's algorithms. The graph is checked for 
@@ -217,6 +253,47 @@ trait DepthFirst extends Solver {
     points.isEmpty
   }
 
+  // // first jingle check works ;)
+  // def jingleCheck(edges: Map[Int, mutable.Set[Int]]): Boolean = {
+  //   var total = 0
+  //   val fullyConnectedNumber = edges.values.count(x => (x.size + 1) == edges.size)
+
+  //   edges.values.foreach(neighbour => {
+  //     // if is fully conected
+  //     if ((neighbour.size + 1) == edges.size) {
+  //       total = total + 2
+  //     } else {
+  //       total = total + ((neighbour.size - fullyConnectedNumber) / 2)
+  //     }
+  //   })
+  //   return total >= edges.size
+  // }
+
+  // def jingleCheck2(edges: Map[Int, mutable.Set[Int]]): Boolean = {
+  //   var total = 0
+  //   val keys = edges.keys.to[mutable.ArraySeq].sorted
+  //   val degreeMap = keys.map(vertex => edges(vertex).size)
+  //   // println(edges)
+
+  //   val highToLowKeys = keys.sortWith((a, b) => degreeMap(a) > degreeMap(b))
+  //   highToLowKeys.foreach(vertex => {
+  //     // println(vertex, degreeMap, total)
+  //     if (degreeMap(vertex) > 1) {
+  //       total = total + 2
+  //     }
+  //     if (degreeMap(vertex) == 1) {
+  //       total = total + 1
+  //     }
+  //     val neighbours = edges(vertex)
+  //     neighbours.foreach(n => {
+  //       degreeMap(n) = degreeMap(n) - 1
+  //     })
+
+  //   })
+
+  //   return total >= edges.size
+  // }
+
  /** Transforms graph into a Map for faster lookup
    *
    * Returns a Map that for a vertex: Int gets a list of all neighbour
@@ -253,6 +330,10 @@ trait DepthFirst extends Solver {
     var iterations   = 0
     val startTime    = nanoTime
     var solution: Option[List[Int]] = None
+
+    // if (!checkStart(edges)) {
+    //   return (Some(false), 0, 0, None)
+    // }
 
     def putBack(
       deleted: mutable.ListBuffer[(Int, Int)], 
@@ -356,6 +437,7 @@ object ArbitraryHeuristic extends DepthFirst {
   def name       = "arbitraryheuristic"
   def pruneFuncs = List()
   def checkFuncs = List()
+  // def startCheckFuncs = List()
 }
 
 object LowHeuristic extends DepthFirst {
@@ -364,6 +446,7 @@ object LowHeuristic extends DepthFirst {
   def name       = "lowheuristic"
   def pruneFuncs = List()
   def checkFuncs = List()
+  // def startCheckFuncs = List()
 }
 
 object HighHeuristic extends DepthFirst {
@@ -372,6 +455,7 @@ object HighHeuristic extends DepthFirst {
   def name       = "highheuristic"
   def pruneFuncs = List()
   def checkFuncs = List()
+  // def startCheckFuncs = List()
 }
 
 object PathPruning extends DepthFirst {
@@ -379,6 +463,7 @@ object PathPruning extends DepthFirst {
   def name = "pathpruning"
   def pruneFuncs = List(pathPruning, solutionPruning)
   def checkFuncs = List()
+  // def startCheckFuncs = List()
 }
 
 object NeighbourPruning extends DepthFirst {
@@ -386,6 +471,7 @@ object NeighbourPruning extends DepthFirst {
   def name = "neighbourpruning"
   def pruneFuncs = List(neighbourPruning, solutionPruning)
   def checkFuncs = List()
+  // def startCheckFuncs = List()
 } 
 
 object NeighbourAndPathPruning extends DepthFirst {
@@ -393,6 +479,7 @@ object NeighbourAndPathPruning extends DepthFirst {
   def name = "neighbourandpathpruning"
   def pruneFuncs = List(pathPruning, neighbourPruning, solutionPruning)
   def checkFuncs = List()
+  // def startCheckFuncs = List()
 }
 
 object CheckOneConnected extends DepthFirst {
@@ -400,6 +487,7 @@ object CheckOneConnected extends DepthFirst {
   def name       = "checkoneconnected"
   def pruneFuncs = List()
   def checkFuncs = List(checkOneConnected)
+  // def startCheckFuncs = List()
 }
 
 object CheckDisconnected extends DepthFirst {
@@ -407,6 +495,7 @@ object CheckDisconnected extends DepthFirst {
   def name       = "checkdisconnected"
   def pruneFuncs = List()
   def checkFuncs = List(checkDisconnected)
+  // def startCheckFuncs = List()
 }
 
 object CheckOneDegree extends DepthFirst {
@@ -414,6 +503,7 @@ object CheckOneDegree extends DepthFirst {
   def name       = "checkonedegree"
   def pruneFuncs = List()
   def checkFuncs = List(checkOneDegree)
+  // def startCheckFuncs = List()
 }
 
 object CheckAll extends DepthFirst {
@@ -421,6 +511,7 @@ object CheckAll extends DepthFirst {
   def name       = "checkall"
   def pruneFuncs = List()
   def checkFuncs = List(checkOneDegree, checkDisconnected, checkOneConnected)
+  // def startCheckFuncs = List()
 }
 
 object CheckOneConnectedWithPruning extends DepthFirst {
@@ -428,6 +519,7 @@ object CheckOneConnectedWithPruning extends DepthFirst {
   def name       = "checkoneconnectedwithpruning"
   def pruneFuncs = List(pathPruning, neighbourPruning, solutionPruning)
   def checkFuncs = List(checkOneConnected)
+  // def startCheckFuncs = List()
 }
 
 object CheckDisconnectedWithPruning extends DepthFirst {
@@ -435,6 +527,7 @@ object CheckDisconnectedWithPruning extends DepthFirst {
   def name       = "checkdisconnectedwithpruning"
   def pruneFuncs = List(pathPruning, neighbourPruning, solutionPruning)
   def checkFuncs = List(checkDisconnected)
+  // def startCheckFuncs = List()
 }
 
 object CheckOneDegreeWithPruning extends DepthFirst {
@@ -442,6 +535,7 @@ object CheckOneDegreeWithPruning extends DepthFirst {
   def name       = "checkonedegreewithpruning"
   def pruneFuncs = List(pathPruning, neighbourPruning, solutionPruning)
   def checkFuncs = List(checkOneDegree)
+  // def startCheckFuncs = List()
 }
 
 object CheckAllWithPruning extends DepthFirst {
@@ -449,6 +543,7 @@ object CheckAllWithPruning extends DepthFirst {
   def name       = "checkallwithpruning"
   def pruneFuncs = List(pathPruning, neighbourPruning, solutionPruning)
   def checkFuncs = List(checkOneDegree, checkDisconnected, checkOneConnected)
+  // def startCheckFuncs = List()
 }
 
 object CheckAllWithPruningLow extends DepthFirst {
@@ -456,11 +551,42 @@ object CheckAllWithPruningLow extends DepthFirst {
   def name       = "checkallwithpruninglow"
   def pruneFuncs = List(pathPruning, neighbourPruning, solutionPruning)
   def checkFuncs = List(checkOneDegree, checkDisconnected, checkOneConnected)
+  // def startCheckFuncs = List()
 }
 
 object CheckAllWithPruningHigh extends DepthFirst {
   def heuristic  = Hueristics.nextVertex("high")
   def name       = "checkallwithpruninglow"
   def pruneFuncs = List(pathPruning, neighbourPruning, solutionPruning)
+  def checkFuncs = List(checkOneDegree, checkDisconnected, checkOneConnected)
+  // def startCheckFuncs = List()
+}
+
+// object SuperAlgo extends DepthFirst {
+//   def heuristic  = Hueristics.nextVertex("low")
+//   def name       = "checkallwithpruning"
+//   def pruneFuncs = List(pathPruning, neighbourPruning, solutionPruning)
+//   def checkFuncs = List(checkOneDegree, checkDisconnected, checkOneConnected)
+//   def startCheckFuncs = List(jingleCheck2)
+// }
+
+object Martello extends DepthFirst {
+  def heuristic  = Hueristics.nextVertex("low")
+  def name       = "martello"
+  def pruneFuncs = List(pathPruning, solutionPruning)
+  def checkFuncs = List(checkOneDegree)
+}
+
+object Rubin extends DepthFirst {
+  def heuristic  = Hueristics.nextVertex("arbitrary")
+  def name       = "rubin"
+  def pruneFuncs = List(pathPruning, solutionPruning, neighbourPruning)
+  def checkFuncs = List(checkOneDegree, checkDisconnected, checkOneConnected, checkClosedLoop)
+}
+
+object Vandegriend extends DepthFirst {
+  def heuristic  = Hueristics.nextVertex("low")
+  def name       = "vandegriend"
+  def pruneFuncs = List(pathPruning, solutionPruning, neighbourPruning)
   def checkFuncs = List(checkOneDegree, checkDisconnected, checkOneConnected)
 }
